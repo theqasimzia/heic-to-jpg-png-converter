@@ -1,14 +1,42 @@
 const express = require('express');
+const multer = require('multer');
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to handle JSON and form data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Set up multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
-// Simple route for testing
-app.get('/', (req, res) => {
-  res.send('HEIC to JPG/PNG Converter API is running!');
+// Endpoint to handle image uploads and conversion
+app.post('/convert', upload.array('images', 200), async (req, res) => {
+  try {
+    const convertedImages = [];
+
+    // Create an output directory if it doesn't exist
+    const outputDir = path.join(__dirname, 'output');
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir);
+    }
+
+    // Loop through uploaded images and convert them
+    for (const file of req.files) {
+      const outputFilePath = path.join(outputDir, `${file.originalname}.jpg`);
+      
+      await sharp(file.path)
+        .toFormat('jpg')
+        .toFile(outputFilePath);
+
+      convertedImages.push(outputFilePath);
+    }
+
+    res.json({ message: 'Conversion successful', files: convertedImages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong during conversion' });
+  }
 });
 
 app.listen(PORT, () => {
