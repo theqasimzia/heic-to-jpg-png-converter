@@ -4,9 +4,13 @@
   "description": "A simple app to convert HEIC images to JPG and PNG in batches",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "start": "node src/app.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "sharp": "^0.33.5"
+  }
 }
