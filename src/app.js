@@ -42,3 +42,5 @@ app.post('/convert', upload.array('images', 200), async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+app.use(express.static('public'));
