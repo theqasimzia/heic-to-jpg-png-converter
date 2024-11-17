@@ -10,8 +10,14 @@
   <h1>HEIC to JPG/PNG Converter</h1>
   <form id="upload-form" enctype="multipart/form-data">
     <input type="file" name="images" multiple accept=".heic">
+    <select id="format" name="format">
+        <option value="jpg">JPG</option>
+        <option value="png">PNG</option>
+      </select>      
     <button type="submit">Convert</button>
   </form>
+  <progress id="progress-bar" value="0" max="100"></progress>
+    <p id="status"></p>
   <div id="output"></div>
 
   <script src="script.js"></script>
