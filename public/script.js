@@ -1,39 +1,29 @@
 document.getElementById('upload-form').addEventListener('submit', async (event) => {
     event.preventDefault();
-  
     const formData = new FormData(event.target);
     const progressBar = document.getElementById('progress-bar');
-    progressBar.value = 0;
+    const status = document.getElementById('status');
+    status.innerHTML = 'Converting images...';
   
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/convert', true);
+    const response = await fetch('/convert', {
+      method: 'POST',
+      body: formData,
+    });
   
-    // Update progress bar
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
-        progressBar.value = percentComplete;
-      }
-    };
+    if (response.ok) {
+      const result = await response.json();
+      progressBar.value = 100;
+      status.innerHTML = '<span class="tick">✔</span> Conversion complete! Downloading...';
   
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        const result = JSON.parse(xhr.responseText);
-        const output = document.getElementById('output');
-        output.innerHTML = '<h2>Conversion Successful!</h2>';
-        result.files.forEach(file => {
-          const link = document.createElement('a');
-          link.href = file;
-          link.textContent = file;
-          link.download = '';
-          output.appendChild(link);
-          output.appendChild(document.createElement('br'));
-        });
-      } else {
-        output.textContent = 'Error: ' + xhr.statusText;
-      }
-    };
-  
-    xhr.send(formData);
+      // Automatically download the zip file
+      const link = document.createElement('a');
+      link.href = result.zipFilePath;
+      link.download = 'converted_images.zip';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      status.textContent = 'Error: ' + response.statusText;
+    }
   });
   
